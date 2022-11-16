@@ -92,26 +92,20 @@ const LoginForm = () => {
 
     axios.defaults.withCredentials = true;
 
-    const loginEmployeeForm = (event,credentials) => {
+    const loginEmployeeForm = (event, credentials) => {
         event.preventDefault()
-        axios.post("http://localhost:3001/login",{
-           // withCredentials: true,
+        axios.post("http://localhost:3001/login", {
+            // withCredentials: true,
             credentials: 'include',
             email: email,
             password: password
         }).then(response => {
             console.log("login", { d: response.data }, { R: response })
-
-        //   if(response){
-        //    console.log("response1111",response)
-        //   } else {
-        //       console.log("response222", response.data[0].email)
-        //   }
-
             if (response.data.message) {
                 setLoginStatus(response.data.message)
                 // navigate.push("/app");
             } else {
+                console.log("inner...", response)
                 setLoginStatus(response.data[0].email)
             }
         })
@@ -119,15 +113,15 @@ const LoginForm = () => {
 
     useEffect(() => {
         axios.get("http://localhost:3001/login").then((response) => {
-            console.log("useffect:",response)
+            console.log("useffect:", response)
             if (response.data.loggedIn === true) {
-                console.log("useffect222:",response)
+                console.log("useffect222:", response)
                 setLoginStatus(response.data.user[0].email);
             } else {
                 console.log("useffecterr")
             }
         });
-    }, [loginStatus]);
+    }, []);
 
     return (
         <>
@@ -188,10 +182,6 @@ const LoginForm = () => {
                             <div>
                                 <h3 className={classes.wrongText}>
                                     {loginStatus}
-                                    {/* loginStatus.map((obj)=>{
-                                        console.log("loginStatus...", loginStatus)
-                                        {email}
-                                    }) */}
 
                                     {/* {loginStatus.map(loginStatus => <div>{loginStatus.email}</div>)} */}
                                 </h3>

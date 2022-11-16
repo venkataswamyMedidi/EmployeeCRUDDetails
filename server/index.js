@@ -6,7 +6,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-
+const jwt = require('jsonwebtoken')
 
 const bcrypt = require('bcrypt')
 const saltRounds = 10;
@@ -107,12 +107,33 @@ app.post('/register', (req, res) => {
         db.query("INSERT INTO employeeUserSchema (firstName, lastName, email, password) VALUES (?,?,?,?)",
             [firstName, lastName, email, hash], (err, result) => {
                 if (err, result) {
-                    console.log({ServerregisterErr:"err"})
+                    console.log({ ServerregisterErr: "err" })
                 } else {
                     res.send({ RegisteredValues: "Uservalues Inserted" })
                 }
             })
     })
+})
+//middleware
+const verifyJwt = (req, res, next) => {
+    const token = req.header["x-access-token"]
+
+    if (!token) {
+        res.send("We need token, please try next time!")
+    } else {
+        jwt.verify(token, "jwtsecret", (err, decoded) => {
+            if (err) {
+                res.json({ auth: false, message: "you failed to Authenticate" })
+            } else {
+                req.userId = decoded.id;
+                next();
+            }
+        })
+    }
+
+}
+app.get("/isUserAuth", verifyJwt, (req, res) => {
+    res.send("Yo, you're Authenticated!")
 })
 
 app.get("/login", (req, res) => {
@@ -122,6 +143,7 @@ app.get("/login", (req, res) => {
         res.send({ loggedIn: false });
     }
 });
+
 
 //User Login Form
 app.post('/login', (req, res) => {
@@ -136,21 +158,28 @@ app.post('/login', (req, res) => {
             }
             if (result.length > 0) {
                 bcrypt.compare(password, result[0].password, (error, response) => {
+
                     if (response) {
-                        req.session.user = result
-                        console.log("loginserver",req.session.user)
-                        res.send(result)
-                    } else {
-                        res.send({ message: "Wrong Email or Password combination!" })
+                        console.log("loginserver", { i: req.session.user })
+                        console.log("loginserver2222", { result, user })
+                        const id = result[0].id
+                        const token = jwt.sign({ id }, "jwtSecret", {
+                            expiresIn: 300,
+                        })
+                        req.session.user = result;
+                        res.json({ auth: true, token: token, result: result })
+                        //res.send(result)
+                    }
+                    else {
+                        res.send({ message: "User does not exist!" })
+                        // console.log({ loginuserexisterr: result[0].email })
                     }
                 })
-            }
-            else {
-                res.send({ message: "User does not exist!" })
-               // console.log({ loginuserexisterr: result[0].email })
+
             }
         })
 })
+
 
 // Employee DataBase API
 app.post('/create', (req, res) => {
