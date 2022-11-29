@@ -1,43 +1,12 @@
 import React from 'react';
-import {makeStyles} from '@material-ui/core'
-
-const useStyles = makeStyles({
-
-  footerStyles: {
-    color: 'white',
-    background: '#9badc0',
-  },
-  linkContainer: {
-    display: 'flex',
-    justifyContent:"center",
-  
-  },
-  links: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '2%',
-    paddingTop: '1%',  
-  },
-  aStyles: {
-    color:'white',
-    textDecoration: 'none',
-    '&:hover': {
-      textDecoration: 'underline'
-    },
-    lineHeight: '180%'
-  },
-  bottom: {
-    textAlign: 'center',
-    padding: '1%'
-  }
-})
+import { footerStyle } from './footerStyle';
 
 export default function Footer() {
 
-  const classes = useStyles();
+  const classes = footerStyle();
 
   return (
-    <footer className={classes.footerStyles}>
+    <footer className={classes.footerBox}>
       <div className={classes.linkContainer}>
         <div className={classes.links}>
           <h3>Company</h3>

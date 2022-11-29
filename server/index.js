@@ -17,16 +17,14 @@ app.use(cors({
     credentials: true,
     origin: ['http://localhost:3000'],
     optionSuccessStatus: 200,
-    methods: ['GET', 'POST'],
-    //     header:('Access-Control-Allow-Credentials', true),
-    //     header:('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'),
-    //    headers: {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }))
 
 
 app.use(function (req, res, next) {
     //res.header('Access-Control-Allow-Origin', req.header('origin'));
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+    //header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
     //res.header({'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'})
     //res.header("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers")
     next();
@@ -116,7 +114,7 @@ app.post('/register', (req, res) => {
 })
 //middleware
 const verifyJwt = (req, res, next) => {
-    const token = req.header["x-access-token"]
+    const token = req.headers["x-access-token"]
 
     if (!token) {
         res.send("We need token, please try next time!")
@@ -160,8 +158,8 @@ app.post('/login', (req, res) => {
                 bcrypt.compare(password, result[0].password, (error, response) => {
 
                     if (response) {
-                        console.log("loginserver", { i: req.session.user })
-                        console.log("loginserver2222", { result, user })
+                        // console.log("loginserver", { i: req.session.user })
+                        // console.log("loginserver2222", { result, user })
                         const id = result[0].id
                         const token = jwt.sign({ id }, "jwtSecret", {
                             expiresIn: 300,
@@ -169,15 +167,17 @@ app.post('/login', (req, res) => {
                         req.session.user = result;
                         res.json({ auth: true, token: token, result: result })
                         //res.send(result)
-                    }
-                    else {
-                        res.send({ message: "User does not exist!" })
-                        // console.log({ loginuserexisterr: result[0].email })
+                    } else {
+                        res.json({ auth: false, message: "wrong email or password combination!" })
                     }
                 })
-
+            } else {
+                res.send({ auth: false, message: "User does not exist!" })
+                // console.log({ loginuserexisterr: result[0].email })
             }
-        })
+        }
+    )
+
 })
 
 
