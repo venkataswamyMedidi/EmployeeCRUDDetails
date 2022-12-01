@@ -38,5 +38,11 @@ export const loginStyle = makeStyles(theme => ({
         display: "flex",
         justifyContent: "center",
         fontfamily: "ui-monospace",
+    },
+    errorMessage: {
+        fontSize: 18,
+        display: "flex",
+        justifyContent: "center",
+        fontFamily: 'emoji'
     }
 }));

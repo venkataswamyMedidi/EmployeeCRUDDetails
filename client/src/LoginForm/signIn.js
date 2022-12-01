@@ -16,7 +16,8 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { loginStyle } from './loginStyle';
 // import Admin from "../Home/admin";
-
+import { useDispatch, useSelector } from 'react-redux';
+// import { employeeAction } from '../Redux/employeeAction'
 
 const MadeWithLove = () => (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -31,26 +32,20 @@ const MadeWithLove = () => (
 
 const LoginForm = () => {
     const classes = loginStyle();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     // const historyRoute = useHistory();
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [loginStatus, setLoginStatus] = useState(false)
-    // const [authenticated, setauthenticated] = useState(false)
-    // localStorage.getItem(localStorage.getItem("authenticated") || false)
+    const [errorMessage, setErrorMessage] = useState(null)
+    const storeState = useSelector(state => state)
+    console.log("storeStateLogin", storeState)
 
-    // const accessType = JSON.parse(localStorage.getItem('authenticated')) || false;
-    // const locationPath = window.location.pathname;
-    // console.log("location.....", { l: locationPath, i: accessType })
+    const user = useSelector(state => state.profile.profile);
+    console.log("storealertLogin", user)
 
-    // let currentDate = new Date();
-    // const token = localStorage.getItem('token');
-    // const decodedToken = token;
-    // const isLocalHost = (('localhost')); //ignoring autologout for local development
-    // const isExpired = (token && decodedToken && decodedToken.exp && (decodedToken.exp * 1000 < currentDate.getTime()));
-
-    // console.log("token.......", { a: token, b: isLocalHost, c: isExpired, e: currentDate })
 
     axios.defaults.withCredentials = true;
 
@@ -65,7 +60,7 @@ const LoginForm = () => {
             console.log("login", { d: response.data }, { R: response })
             if (!response.data.auth) {
                 setLoginStatus(false)
-
+                setErrorMessage(response.data.message)
                 //setLoginStatus(response.data.message)
                 navigate("/signIn"); // first approach without authenticate, no message
             } else {
@@ -163,6 +158,9 @@ const LoginForm = () => {
                             >
                                 Sign In
                             </Button>
+                            <div className={classes.errorMessage}>
+                                {errorMessage}
+                            </div>
                             <div>
                                 <h3 className={classes.wrongText}>
                                     {loginStatus && (
