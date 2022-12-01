@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 // import { useHistory } from "react-router-dom"
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -14,7 +14,9 @@ import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 // import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
+import { loginStyle } from './loginStyle';
+// import Admin from "../Home/admin";
+
 
 const MadeWithLove = () => (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -26,69 +28,29 @@ const MadeWithLove = () => (
     </Typography>
 );
 
-const useStyles = makeStyles(theme => ({
-    //   root: {
-    //     height: "100vh"
-    //   },
-    image: {
-        backgroundImage: "url(https://source.unsplash.com/random)",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        height: "100vh"
-    },
-    paper: {
-        margin: theme.spacing(8, 4),
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        maxWidth: "100"
-    },
-    avatar: {
-        margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main
-    },
-    form: {
-        width: "100%", // Fix IE 11 issue.
-        marginTop: theme.spacing(1)
-    },
-    submit: {
-        margin: theme.spacing(3, 0, 2)
-    },
-    formtext: {
-        height: 600,
-        marginTop: 150
-    },
-    wrongText: {
-        display: "flex",
-        justifyContent: "center",
-        fontfamily: "ui-monospace",
-    }
-}));
 
 const LoginForm = () => {
-    const classes = useStyles();
-    // const navigate = useNavigate();
+    const classes = loginStyle();
+    const navigate = useNavigate();
     // const historyRoute = useHistory();
-    // const [firstName, setFirstName] = useState("")
-    // const [lastName, setLastName] = useState("")
+
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [loginStatus, setLoginStatus] = useState("")
+    const [loginStatus, setLoginStatus] = useState(false)
     // const [authenticated, setauthenticated] = useState(false)
-    // localStorage.getItem(localStorage.getItem("authenticated") || false));
+    // localStorage.getItem(localStorage.getItem("authenticated") || false)
 
-    // const accessType = JSON.parse(localStorage.getItem('authenticated'))|| false;
+    // const accessType = JSON.parse(localStorage.getItem('authenticated')) || false;
     // const locationPath = window.location.pathname;
-    // console.log("location.....",locationPath, {i:accessType})
+    // console.log("location.....", { l: locationPath, i: accessType })
 
     // let currentDate = new Date();
     // const token = localStorage.getItem('token');
-    // const decodedToken=token;
+    // const decodedToken = token;
     // const isLocalHost = (('localhost')); //ignoring autologout for local development
     // const isExpired = (token && decodedToken && decodedToken.exp && (decodedToken.exp * 1000 < currentDate.getTime()));
 
-    // console.log("token.......", token, isLocalHost, isExpired)
+    // console.log("token.......", { a: token, b: isLocalHost, c: isExpired, e: currentDate })
 
     axios.defaults.withCredentials = true;
 
@@ -101,27 +63,49 @@ const LoginForm = () => {
             password: password
         }).then(response => {
             console.log("login", { d: response.data }, { R: response })
-            if (response.data.message) {
-                setLoginStatus(response.data.message)
-                // navigate.push("/app");
+            if (!response.data.auth) {
+                setLoginStatus(false)
+
+                //setLoginStatus(response.data.message)
+                navigate("/signIn"); // first approach without authenticate, no message
             } else {
                 console.log("inner...", response)
-                setLoginStatus(response.data[0].email)
+                localStorage.setItem("token", response.data.token)
+                setLoginStatus(true)
+                navigate("/app");
+                // setLoginStatus(response.data[0].email) 
             }
         })
     }
 
-    useEffect(() => {
+    const userAuthenticate = () => {
+        axios.get("http://localhost:3001/isUserAuth", {
+            headers: {
+                "x-access-token": localStorage.getItem("token")
+            }
+        }).then((response) => {
+            console.log({ "responseAuth": response })
+            // if ('auth' === true) {  // second apparoch with authenticate, !button 
+            //     navigate("/admin");
+            // } else {
+            //     navigate("/login");
+            // }
+        })
+    }
+
+    useEffect(() => { // running everytime when we refresh the page, when refresh it will display the email
         axios.get("http://localhost:3001/login").then((response) => {
             console.log("useffect:", response)
             if (response.data.loggedIn === true) {
                 console.log("useffect222:", response)
-                setLoginStatus(response.data.user[0].email);
+                //setLoginStatus(response.data.user[0].email);
+                setLoginStatus(true)
+                navigate("/admin");
             } else {
-                console.log("useffecterr")
+                console.log("useffecterr", response)
             }
         });
-    }, []);
+    });
 
     return (
         <>
@@ -181,9 +165,12 @@ const LoginForm = () => {
                             </Button>
                             <div>
                                 <h3 className={classes.wrongText}>
-                                    {loginStatus}
-
-                                    {/* {loginStatus.map(loginStatus => <div>{loginStatus.email}</div>)} */}
+                                    {loginStatus && (
+                                        <button onClick={userAuthenticate}>check if Authenticate
+                                            {/* {loginStatus === "admin" && <Admin />} */}
+                                        </button>
+                                    )
+                                    }
                                 </h3>
                             </div>
 
