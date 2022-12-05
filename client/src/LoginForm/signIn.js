@@ -32,7 +32,7 @@ const MadeWithLove = () => (
 
 const LoginForm = () => {
     const classes = loginStyle();
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const navigate = useNavigate();
     // const historyRoute = useHistory();
 
