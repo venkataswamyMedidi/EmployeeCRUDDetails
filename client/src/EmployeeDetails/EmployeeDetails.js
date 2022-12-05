@@ -1,36 +1,19 @@
-
 import * as React from 'react';
 import { useState } from "react";
 import axios from "axios";
 import './index.css';
 import { makeStyles } from "@material-ui/core/styles";
-import { createTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import MUIDataTable from "mui-datatables";
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import EmployeeNavBar from '../NavBar/EmployeeNavBar'
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const useStyles = makeStyles({
     table: {
         minWidth: 650,
-        "& .MuiTableCell-root": {
-            borderBottom: 0,
-            padding: "8px 16px",
-            fontSize: 15
-        },
-        '&.MuiTableCell - paddingCheckbox': {
-            backgroundColor: 'red'
-        },
-        // "& .MUIDataTableBodyCell": {
-        //     root: {
-        //         backgroundColor: "#FF0000",
-        //     },
-        // },
-        // "& MuiTableRow-root": {
-        //     backgroundColor: "red"
-        // }
     },
 });
 
@@ -52,11 +35,9 @@ function EmployeeDetails() {
             name: "name",
             options: {
                 sortOrder: "asc"
-            }
+            },
+            //editable: true,
         },
-        // {
-        //   name: "Title"
-        // },
         {
             name: "age"
         },
@@ -108,8 +89,6 @@ function EmployeeDetails() {
     ];
 
     const options = {
-        // responsive: "scrollMaxHeight" "standard","vertical","verticalAlways","simple
-        //responsive: "standard | vertical"
         filterType: "checkbox",
         responsive: "standard",
         rowsPerPage: [3],
@@ -130,22 +109,47 @@ function EmployeeDetails() {
 
     const getMuiTheme = () =>
         createTheme({
-            overrides: {
-                MUIDataTableBodyCell: {
-                    root: {
-                        backgroundColor: "red",
-                    },
+            components: {
+                MUIDataTableBodyRow: {
+                    styleOverrides: {
+                        root: {
+                            padding: '8px',
+                            backgroundColor: 'rgb(25 118 210 / 16%)',
+                        }
+                    }
                 },
-                MUIDataTablePagination: {
-                    root: {
-                        backgroundColor: "blue",
-                        color: "#fff",
-                    },
+                MuiToolbar: {
+                    styleOverrides: {
+                        regular: {
+                            minHeight: '8px',
+                            backgroundColor: 'rgb(102 171 213)'
+                        }
+                    }
                 },
-                "& MuiTableRow-root": {
-                    backgroundColor: "red"
-                }
-            },
+                // MUIDataTableHead: {
+                //     styleOverrides: {
+                //         main: {
+                //             backgroundColor: 'rgb(176, 77, 49)'
+                //         }
+                //     }
+                // },
+                MUIDataTableHeadCell: {
+                    styleOverrides: {
+                        fixedHeader: {
+                            color: "darkred",
+                            backgroundColor: "#0a04071f",
+                        }
+                    }
+                },
+                MuiTablePagination: {
+                    styleOverrides: {
+                        toolbar: {
+                            backgroundColor: "#e3dbcf",
+                            // color: "red",
+                        },
+                    }
+                },
+            }
         });
 
     const addEmployee = () => {
@@ -277,7 +281,6 @@ function EmployeeDetails() {
                         Add Employee </Button>
                 </div>
             </div>
-
             <div>
                 <Button onClick={handleOpen} variant="contained" style={{ fontFamily: 'ui-monospace', margin: '20px 6px 6px 638px' }} >Employee Data</Button>
                 <Modal
@@ -289,8 +292,8 @@ function EmployeeDetails() {
                     <Box>
                         <div className="employees">
                             <h2>Show Employees Data</h2>
-                            <MuiThemeProvider theme={getMuiTheme}>
-                                <button onClick={getEmployee}>Display Records</button>
+                            <button onClick={getEmployee}>Display Records</button>
+                            <ThemeProvider theme={getMuiTheme()}>
                                 <MUIDataTable
                                     className={classes.table}
                                     title={"Employee list"}
@@ -298,7 +301,7 @@ function EmployeeDetails() {
                                     columns={columns}
                                     options={options}
                                 />
-                            </MuiThemeProvider>
+                            </ThemeProvider>
                             <div className='employeeMap'>
                                 {/* <h5>Wage:</h5> */}
                                 <input type="text" className="" placeholder="2000..."
